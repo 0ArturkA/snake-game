@@ -24,6 +24,7 @@
         GRID_SIZE_X: 20,
         GRID_SIZE_Y: 20,
         GAME_TICK_MS: 500,
+        APPLE_INTERVAL_MS: 5000,
     };
 
     SnakeGame.keyCodes = {
@@ -75,6 +76,9 @@
         },
         setupTicker() {
             this.ticker = setInterval(() => this.update(), SnakeGame.config.GAME_TICK_MS);
+        },
+        setupAppleSpawner() {
+            setInterval(() => this.spawnApple(), SnakeGame.config.APPLE_INTERVAL_MS);
         },
         handleEvent() {
             document.addEventListener(SnakeGame.events.KEYDOWN, (e) => this.onKeyDown(e));
@@ -130,16 +134,32 @@
                 }
             }
         },
-        clearGrid() {
+        clearSnakeFromGrid() {
             for (const row of this.grid) {
                 for (const cell of row) {
-                    cell.className = '';
+                    if (cell.className === 'snake') {
+                        cell.className = '';
+                    }
+                }
+            }
+        },
+        genRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        },
+        spawnApple() {
+            let appleSpawned = false;
+            while (!appleSpawned) {
+                const randomX = this.genRandomInt(0, this.grid.length - 1);
+                const randomY = this.genRandomInt(0, this.grid[randomX].length - 1);
+                if (!this.grid[randomX][randomY].className) {
+                    this.grid[randomX][randomY].className = 'apple';
+                    appleSpawned = true;
                 }
             }
         },
         update() {
             if (this.playing) {
-                this.clearGrid();
+                this.clearSnakeFromGrid();
 
                 // Delete last block
                 if (this.snake.length > 1) {
@@ -181,7 +201,7 @@
                         (this.grid[block.y][block.x].className === 'snake') // Self
                     ) {
                         alert('Game over');
-                        this.clearGrid();
+                        this.clearSnakeFromGrid();
                         this.playing = false;
                         this.crashed = true;
                         return;
@@ -202,6 +222,7 @@
             this.setupGrid();
             this.setupSnake();
             this.setupTicker();
+            this.setupAppleSpawner();
             this.handleEvent();
         },
     };
