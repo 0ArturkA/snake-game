@@ -9,7 +9,7 @@
         this.tableEl = document.getElementsByTagName('table')[0];
         this.grid = [];
         this.curDir = 0;
-        this.ticker = null;
+        this.curTickMs = 0;
         this.playing = false;
         this.crashed = false;
         this.tickDirSet = false;
@@ -24,8 +24,9 @@
     SnakeGame.config = {
         GRID_SIZE_X: 20,
         GRID_SIZE_Y: 20,
-        GAME_TICK_MS: 500,
+        START_GAME_TICK_MS: 500,
         APPLE_INTERVAL_MS: 5000,
+        EATING_MULTIPLIER: 0.8,
     };
 
     SnakeGame.keyCodes = {
@@ -76,7 +77,15 @@
             });
         },
         setupTicker() {
-            this.ticker = setInterval(() => this.update(), SnakeGame.config.GAME_TICK_MS);
+            this.curTickMs = SnakeGame.config.START_GAME_TICK_MS;
+            const nextTick = () => {
+                setTimeout(() => {
+                    this.update();
+                    console.log(this.curTickMs);
+                    nextTick();
+                }, this.curTickMs);
+            };
+            nextTick();
         },
         setupAppleSpawner() {
             setInterval(() => this.spawnApple(), SnakeGame.config.APPLE_INTERVAL_MS);
@@ -227,6 +236,7 @@
 
                     // Check apple
                     if (this.grid[block.y][block.x].className === 'apple') {
+                        this.curTickMs *= SnakeGame.config.EATING_MULTIPLIER;
                         this.appleEaten = true;
                     }
 
