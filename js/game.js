@@ -248,6 +248,7 @@
         },
         restart() {
             this.crashed = false;
+            this.curTickMs = SnakeGame.config.START_GAME_TICK_MS;
             this.snake = [];
             this.setupSnake();
         },
