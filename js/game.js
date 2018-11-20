@@ -147,13 +147,15 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         },
         spawnApple() {
-            let appleSpawned = false;
-            while (!appleSpawned) {
-                const randomX = this.genRandomInt(0, this.grid.length - 1);
-                const randomY = this.genRandomInt(0, this.grid[randomX].length - 1);
-                if (!this.grid[randomX][randomY].className) {
-                    this.grid[randomX][randomY].className = 'apple';
-                    appleSpawned = true;
+            if (this.playing) {
+                let appleSpawned = false;
+                while (!appleSpawned) {
+                    const randomX = this.genRandomInt(0, this.grid.length - 1);
+                    const randomY = this.genRandomInt(0, this.grid[randomX].length - 1);
+                    if (!this.grid[randomX][randomY].className) {
+                        this.grid[randomX][randomY].className = 'apple';
+                        appleSpawned = true;
+                    }
                 }
             }
         },
