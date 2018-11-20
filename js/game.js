@@ -13,6 +13,7 @@
         this.playing = false;
         this.crashed = false;
         this.tickDirSet = false;
+        this.appleEaten = false;
 
         this.snake = [];
 
@@ -143,6 +144,13 @@
                 }
             }
         },
+        clearGrid() {
+            for (const row of this.grid) {
+                for (const cell of row) {
+                    cell.className = '';
+                }
+            }
+        },
         genRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         },
@@ -159,41 +167,49 @@
                 }
             }
         },
+        addSnakeHeadBlock(block) {
+            if (this.curDir === SnakeGame.dirs.UP) {
+                this.snake.push({
+                    x: block.x,
+                    y: block.y + 1,
+                });
+            }
+            if (this.curDir === SnakeGame.dirs.DOWN) {
+                this.snake.push({
+                    x: block.x,
+                    y: block.y - 1,
+                });
+            }
+            if (this.curDir === SnakeGame.dirs.LEFT) {
+                this.snake.push({
+                    x: block.x - 1,
+                    y: block.y,
+                });
+            }
+            if (this.curDir === SnakeGame.dirs.RIGHT) {
+                this.snake.push({
+                    x: block.x + 1,
+                    y: block.y,
+                });
+            }
+        },
         update() {
             if (this.playing) {
                 this.clearSnakeFromGrid();
 
                 // Delete last block
-                if (this.snake.length > 1) {
+                if (this.snake.length > 1 && !this.appleEaten) {
                     this.snake.splice(0, 1);
+                }
+
+                // Reset apple eat
+                if (this.appleEaten) {
+                    this.appleEaten = false;
                 }
 
                 // Add head block
                 let headBlock = this.snake[this.snake.length - 1];
-                if (this.curDir === SnakeGame.dirs.UP) {
-                    this.snake.push({
-                        x: headBlock.x,
-                        y: headBlock.y + 1,
-                    });
-                }
-                if (this.curDir === SnakeGame.dirs.DOWN) {
-                    this.snake.push({
-                        x: headBlock.x,
-                        y: headBlock.y - 1,
-                    });
-                }
-                if (this.curDir === SnakeGame.dirs.LEFT) {
-                    this.snake.push({
-                        x: headBlock.x - 1,
-                        y: headBlock.y,
-                    });
-                }
-                if (this.curDir === SnakeGame.dirs.RIGHT) {
-                    this.snake.push({
-                        x: headBlock.x + 1,
-                        y: headBlock.y,
-                    });
-                }
+                this.addSnakeHeadBlock(headBlock);
 
                 // Draw snake
                 for (const block of this.snake) {
@@ -203,10 +219,15 @@
                         (this.grid[block.y][block.x].className === 'snake') // Self
                     ) {
                         alert('Game over');
-                        this.clearSnakeFromGrid();
+                        this.clearGrid();
                         this.playing = false;
                         this.crashed = true;
                         return;
+                    }
+
+                    // Check apple
+                    if (this.grid[block.y][block.x].className === 'apple') {
+                        this.appleEaten = true;
                     }
 
                     this.grid[block.y][block.x].className = 'snake';
